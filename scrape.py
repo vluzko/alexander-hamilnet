@@ -1,10 +1,13 @@
 import pickle
 import requests
+import random
 
 from bs4 import BeautifulSoup
 from pathlib import Path
 
 DATA = Path(__file__).parent / 'data'
+TRAIN = DATA / 'train_fed.txt'
+TEST = DATA / 'test_fed.txt'
 
 
 def scrape_fed():
@@ -26,7 +29,25 @@ def scrape_fed():
             full_text = '\n'.join(text)
             papers[i+1] = (author, full_text)
     pickle.dump(papers, (DATA / 'fed_papers.pkl').open('wb'))
+    return papers
+
+
+def dump_text():
+    try:
+        data = pickle.load((DATA / 'fed_papers.pkl').open('rb'))
+    except FileNotFoundError:
+        data = scrape_fed()
+    train_size = int(len(data) * 0.9)
+    train_set = random.sample(list(data.keys()), train_size)
+    test_set = [x for x in data.keys() if x not in train_set]
+    train_data = [data[k][1] for k in train_set]
+    test_data = [data[k][1] for k in test_set]
+    train_text = '\n'.join(train_data)
+    test_text = '\n'.join(test_data)
+
+    TRAIN.open('w+').write(train_text)
+    TEST.open('w+').write(test_text)
 
 
 if __name__ == '__main__':
-    scrape_fed()
+    dump_text()
