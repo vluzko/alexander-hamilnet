@@ -51,6 +51,7 @@ def main():
         eval_dataset=test_dataset
     )
     trainer.train()
+    trainer.save_model()
 
 
 if __name__ == '__main__':
