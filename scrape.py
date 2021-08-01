@@ -1,3 +1,4 @@
+import csv
 import pickle
 import requests
 import random
@@ -6,8 +7,10 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 
 DATA = Path(__file__).parent / 'data'
-TRAIN = DATA / 'train_fed.txt'
-TEST = DATA / 'test_fed.txt'
+TRAIN = DATA / 'train.txt'
+TRAIN_CSV = DATA / 'train.csv'
+VALID = DATA / 'validation.txt'
+VALID_CSV = DATA / 'validation.csv'
 
 
 def scrape_fed():
@@ -46,8 +49,31 @@ def dump_text():
     test_text = '\n'.join(test_data)
 
     TRAIN.open('w+').write(train_text)
-    TEST.open('w+').write(test_text)
+    VALID.open('w+').write(test_text)
+
+
+def convert_to_csv():
+    if not (TRAIN.is_file() and VALID.is_file()):
+        dump_text()
+    with TRAIN.open('r', encoding='utf-8') as txtfile:
+        all_text = txtfile.read()
+    with TRAIN_CSV.open(mode='w', encoding='utf-8') as csv_file:
+        fieldnames = ['text']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow({'text': all_text})
+
+
+    with VALID.open(encoding='utf-8') as txtfile:
+        all_text = txtfile.read()
+    with VALID_CSV.open(mode='w', encoding='utf-8') as csv_file:
+        fieldnames = ['text']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow({'text': all_text})
+
+    # print("created train.csv and validation.csv files")
 
 
 if __name__ == '__main__':
-    dump_text()
+    convert_to_csv()
