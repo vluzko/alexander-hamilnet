@@ -1,1 +1,8 @@
 data/
+Pipfile.lock
+.vscode/
+__pycache__/
+data/
+models/
+finetune-gpt2xl/wandb/*
+finetune-gpt2xl/runs/*
