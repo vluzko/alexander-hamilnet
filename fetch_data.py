@@ -6,12 +6,16 @@ MAIN_INDEX = 'https://founders.archives.gov/volumes/Hamilton'
 NUM_SUB_INDICES = 27
 
 
-def process_page(link: str):
+def process_page(link: str) -> str:
     result = request.urlopen(link).read()
     parsed = BeautifulSoup(result)
 
     paper_title = parsed.find('h1', {'class': 'title'})
-    document = parsed.find('div', id='document')
+    document = parsed.find('div', {'class': 'docbody'})
+
+    all_text = ''.join(document.findAll(text=True))
+    return all_text
+
 
 # https://founders.archives.gov/?q=Volume%3AHamilton-01-01&s=1511311112&r=1
 # https://founders.archives.gov/?q=Volume%3AHamilton-01-01&s=1511211112&r=31
